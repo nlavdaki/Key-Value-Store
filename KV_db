@@ -1,0 +1,88 @@
+import random
+import string
+import pandas as pd
+import json
+import re
+
+#define the path of the keyFile.txt file where the nested keys and their types are stored
+z= pd.read_table('C:/Users/Lavdi/OneDrive/Υπολογιστής/keyFile.txt', delimiter=" ", usecols=['keys','keystype'])
+dk=pd.DataFrame(z)
+# Define a function that converts a data type string to the corresponding data type
+def convert_type(type_str):
+  if type_str == 'int':
+    return int
+  elif type_str == 'str':
+
+    return str
+  elif type_str == 'float':
+    return float
+#dk is the df which contains the possible nesteing keys and their types nest_key is the name of the keys and type_nest_key their types
+dk['keystype']=dk['keystype'].apply(convert_type)
+nest_key =dk['keys']
+type_nest_key=dk['keystype']
+
+
+#I suggest to set the preferable characteristics of the kv db at the end on print() and if you want to save them in data function
+def create_database(d, n, m, l):
+  database = {}
+  keys = nest_key.to_dict()
+  keys_list = list(keys.values())
+  keys_length = len(keys_list)
+#n : number of lines
+  for row in range(n):
+    current = {}
+#m maximum number of keys in every value
+    for i in range(0,m):
+#this is a process to link the random key generated for each value to the type of its value generated for it
+      dk_indexed = dk.reset_index()
+
+      value_key = keys_list[random.randint(0, keys_length - 1)]
+
+      row_index = dk_indexed[dk_indexed['keys'] == value_key]['index'].iloc[0]
+      n_value_type = type_nest_key.loc[row_index]
+      value_type = n_value_type
+#value data generation for each type
+      ll = random.randint(0, l)
+      if value_type == int:
+        value = random.randint(0, 10 ** l)
+      elif value_type == float:
+        value = random.uniform(0, 10 ** l)
+      elif value_type == str:
+        value = "".join(random.choices(string.ascii_lowercase, k=ll)) or ' '
+      else:
+        value = ' '
+      current_nested = current
+#d: the depth aka the maximum number of nests in each value
+      for depth in range(0,d):
+        new_key = keys_list[random.randint(0, keys_length - 1)]
+        if new_key not in current_nested:
+          current_nested[new_key] = {}
+        current_nested = current_nested[new_key]
+      current_nested[value_key] = value
+
+    database["key" + str(row + 1)] = current
+  return database
+
+
+#define the characteristics of the database in result and in data if you want to store it also change the path
+result = str(create_database(d=1, n=25, m=2, l=10))
+
+
+def sep_lines(results):
+    lines = [line for line in re.split(r" 'key", results) if line]
+    for i,line in enumerate(lines):
+        if i != 0:
+            print(" 'key"+line )
+        else:
+            print(line)
+
+
+
+
+
+#path to store data created, change only the path and not the txt name
+path = 'C:/Users/Lavdi/OneDrive/Έγγραφα/dataToIndex.txt'
+
+with open(path,'w') as f:
+  f.write(str(sep_lines(result)))
+  f.close()
