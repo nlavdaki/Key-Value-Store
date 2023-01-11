@@ -2,6 +2,7 @@
 
 
 Programming Assignment
+
 In this project we will be creating a simple version of a distributed, fault-tolerant, Key-Value (KV)
 database (or store), with a few tweaks. From Wikipedia: a key–value database, or key–value store, is a
 data storage paradigm designed for storing, retrieving, and managing associative arrays, and a data
