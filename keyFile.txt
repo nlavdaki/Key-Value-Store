@@ -1,0 +1,6 @@
+keys keystype
+Sk str
+Ik int
+Fk float
+S_k str
+I_k int
