@@ -1,3 +1,4 @@
+
 import random
 import string
 import pandas as pd
@@ -67,22 +68,30 @@ def create_database(d, n, m, l):
 #define the characteristics of the database in result and in data if you want to store it also change the path
 result = str(create_database(d=1, n=25, m=2, l=10))
 
-
-def sep_lines(results):
-    lines = [line for line in re.split(r" 'key", results) if line]
-    for i,line in enumerate(lines):
-        if i != 0:
-            print(" 'key"+line )
-        else:
-            print(line)
-
-
-
-
-
 #path to store data created, change only the path and not the txt name
 path = 'C:/Users/Lavdi/OneDrive/Έγγραφα/dataToIndex.txt'
 
-with open(path,'w') as f:
-  f.write(str(sep_lines(result)))
-  f.close()
+
+with open(path, 'w') as f:
+    lines = re.split(r" 'key", result)
+    for i,line in enumerate(lines):
+        if i != 0:
+            f.write(" 'key"+line + '\n')
+        else:
+            f.write(line + '\n')
+
+
+
+o = open(path, 'r')
+r = o.read()
+print(r)
+
+
+
+
+
+
+
+
+
+
