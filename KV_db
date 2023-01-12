@@ -1,34 +1,39 @@
-
+import argparse
 import random
 import string
 import pandas as pd
-import json
 import re
+import os
 
-#define the path of the keyFile.txt file where the nested keys and their types are stored
-z= pd.read_table('C:/Users/Lavdi/OneDrive/Υπολογιστής/keyFile.txt', delimiter=" ", usecols=['keys','keystype'])
-dk=pd.DataFrame(z)
+
+
 # Define a function that converts a data type string to the corresponding data type
 def convert_type(type_str):
-  if type_str == 'int':
-    return int
-  elif type_str == 'str':
-
-    return str
-  elif type_str == 'float':
-    return float
-#dk is the df which contains the possible nesteing keys and their types nest_key is the name of the keys and type_nest_key their types
-dk['keystype']=dk['keystype'].apply(convert_type)
-nest_key =dk['keys']
-type_nest_key=dk['keystype']
+    if type_str == 'int':
+        return int
+    elif type_str == 'str':
+        return str
+    elif type_str == 'float':
+        return float
 
 
-#I suggest to set the preferable characteristics of the kv db at the end on print() and if you want to save them in data function
-def create_database(d, n, m, l):
-  database = {}
+
+
+#data func
+def create_database(keyFile,d, n, m, l):
+# read the keyfile
+  z = pd.read_csv(keyFile,delimiter=" ", usecols=['keys','keystype'])
+  dk = pd.DataFrame(z)
+# dk is the df which contains the possible nesteing keys and their types nest_key is the name of the keys and type_nest_key their types
+  dk['keystype'] = dk['keystype'].apply(convert_type)
+  nest_key = dk['keys']
+  type_nest_key = dk['keystype']
   keys = nest_key.to_dict()
   keys_list = list(keys.values())
   keys_length = len(keys_list)
+
+  database = {}
+
 #n : number of lines
   for row in range(n):
     current = {}
@@ -64,34 +69,45 @@ def create_database(d, n, m, l):
     database["key" + str(row + 1)] = current
   return database
 
+def main(args):
+    # call create_database function
+    result = create_database(keyFile=args.keyFile, d=args.d, n=args.n, m=args.m, l=args.l)
 
-#define the characteristics of the database in result and in data if you want to store it also change the path
-result = str(create_database(d=1, n=25, m=2, l=10))
+    # # call create_database with the arguments from the command line
+    # result = create_database(keyFile=args.keyFile, d=args.d, n=args.n, m=args.m, l=args.l)
 
-#path to store data created, change only the path and not the txt name
-path = 'C:/Users/Lavdi/OneDrive/Έγγραφα/dataToIndex.txt'
+    keyFile_dir = os.path.dirname(args.keyFile)
+    datafile_path = os.path.join(keyFile_dir, 'dataToIndex.txt')
 
+    with open(datafile_path, 'w') as f:
+        lines = re.split(r" 'key", str(result))
+        for i, line in enumerate(lines):
+            if i != 0:
+                f.write(" 'key" + line + '\n')
+            else:
+                f.write(line + '\n')
 
-with open(path, 'w') as f:
-    lines = re.split(r" 'key", result)
-    for i,line in enumerate(lines):
-        if i != 0:
-            f.write(" 'key"+line + '\n')
-        else:
-            f.write(line + '\n')
-
-
-
-o = open(path, 'r')
-r = o.read()
-print(r)
-
+    o = open(datafile_path, 'r')
+    r = o.read()
 
 
 
 
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-k", "--keyFile", help="path to key file", type=str, required=True)
+    parser.add_argument("-n", help="number of lines", type=int, required=True)
+    parser.add_argument("-d", help="depth", type=int, required=True)
+    parser.add_argument("-l", help="length", type=int, required=True)
+    parser.add_argument("-m", help="maximum number of keys in every value", type=int, required=True)
 
+    args = parser.parse_args()
+
+
+    print("The process has Started!")
+    main(args=args)
+    print(f"The process has Finished!")
 
 
 
