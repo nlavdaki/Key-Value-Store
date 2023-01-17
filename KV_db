@@ -4,6 +4,7 @@ import string
 import pandas as pd
 import re
 import os
+import json
 
 
 
@@ -20,7 +21,7 @@ def convert_type(type_str):
 
 
 #data func
-def create_database(keyFile,d, n, m, l):
+def create_database(keyFile, d, n, m, l):
 # read the keyfile
   z = pd.read_csv(keyFile,delimiter=" ", usecols=['keys','keystype'])
   dk = pd.DataFrame(z)
@@ -66,32 +67,26 @@ def create_database(keyFile,d, n, m, l):
         current_nested = current_nested[new_key]
       current_nested[value_key] = value
 
-    database["key" + str(row + 1)] = current
+    database['key' + str(row + 1)] = current
   return database
+
+
+
 
 def main(args):
     # call create_database function
     result = create_database(keyFile=args.keyFile, d=args.d, n=args.n, m=args.m, l=args.l)
 
-    # # call create_database with the arguments from the command line
-    # result = create_database(keyFile=args.keyFile, d=args.d, n=args.n, m=args.m, l=args.l)
-
     keyFile_dir = os.path.dirname(args.keyFile)
     datafile_path = os.path.join(keyFile_dir, 'dataToIndex.txt')
 
-    with open(datafile_path, 'w') as f:
-        lines = re.split(r" 'key", str(result))
-        for i, line in enumerate(lines):
-            if i != 0:
-                f.write(" 'key" + line + '\n')
-            else:
-                f.write(line + '\n')
-
-    o = open(datafile_path, 'r')
-    r = o.read()
 
 
-
+    with open(datafile_path, "w") as f:
+        for key, value in result.items():
+            json_str = json.dumps(value, separators=(',', ': '))
+            f.write('"{}": {}'.format(key, json_str))
+            f.write('\n')
 
 
 if __name__ == "__main__":
