@@ -9,6 +9,7 @@ keys.
 
 
 1. Data Creation 
+
 Our KV store will be able to index data of arbitrary length and arbitrary nesting of the form:
 key -> value
 In this case, key represents the key of the data that we care to store and value is the payload (or
@@ -56,6 +57,7 @@ key2, key3, etc. for easier debugging.
 
 
 2. Key Value Store 
+
 This part consists of two programs, a Key-Value client that will be accepting queries and will be
 redirecting requests to the Key-Value servers, collecting the results and presenting them to the user
 and a KV Server that will be storing the actual data and will be handling the queries coming from the
@@ -84,6 +86,7 @@ successful it should respond to the client with OK or ERROR if there was a probl
 Once the indexing process has completed, the client now expects from the keyboard one of the
 following commands:
 a) GET key
+
 In this case, the data with the given high-level key (i.e., you won’t be searching inside any value) is
 queried across all servers and if the results are found it is printed on the screen. For example:
 GET person1
@@ -95,16 +98,19 @@ You are free to handle quotes “” as you like. Specifically, the following in
 correct, but please specify how you handle this (as well as any other assumptions you make) in your
 README:
 GET “person1”
+
 “person1” -> [ “name” -> “John” | “age” -> 22 ]
 Since we implemented k-replication, the client should continue to work unless k servers are down. For
 example, for k=2 if we had 3 servers running and one is down (i.e., 2 left) the server can still compute
 correct results. If >= 2 servers are down the client should output a warning indicating that k or more
 servers are down and therefore it cannot guarantee the correct output.
 b) DELETE key
+
 This command deletes the specified high-level key (i.e., you don’t need to search within each value).
 This command needs to be forwarded to all servers. If there is even one server down, delete cannot be
 reliably executed and thus there should be a message indicating that delete cannot happen.
 c) QUERY keypath
+
 This command is similar to GET above but is meant to return the value of a subkey in the value part of
 the high level path. For example, for the data
 “person2” -> [ “name” -> “Mary” | “address” -> [ “street” -> “Panepistimiou” | “number”-> 12 ]]
@@ -121,6 +127,7 @@ Both GET and QUERY should specify that the key was not found if a query with a n
 asked. QUERY works in an identical way to GET as far as replication (i.e., number of available servers)
 is concerned.
 d) COMPUTE f(x) WHERE x = QUERY key1.key2…
+
 In this case you need to compute a formula with values coming from a query to the KV store. Here is an
 example COMPUTE:
 COMPUTE 2*x WHERE x = QUERY person2.address.number
@@ -139,7 +146,9 @@ COMPUTE 2^x WHERE x = QUERY person2.address.number // 4096
 
 The KV Server will be starting at a specific IP and port and will be serving queries coming from the KV
 client. The KV Server should start as follows:
+
 kvServer -a ip_address -p port
+
 The server starts at the specified IP address and port (which should be one from the server file that the
 client is accepting as input) and is waiting for queries. Once the query is received (as described in the
 client section above), the server parses the query. If the query is incorrect (e.g. missing }) the server
@@ -155,11 +164,14 @@ Here is one example of a trie for a set of keywords:
 Example: standard trie for the set of strings
 S = { bear, bell, bid, bull, buy, sell, stock, stop }
 For the key “bear” we would be looking for the data in the leftmost branch of the tree.
-2-c ) Advanced Query Functionality (30%)
+
+2-c ) Advanced Query Functionality 
+
 In this case, you will be extending the COMPUTE operation to allow for more advanced computations.
 More specifically, you will be able to handle more variables as well as precedence of the operators and
 parentheses. You should also recognize trigonometric (sin, cos, tan) and logarithmic (base 10)
 functions.
+
 COMPUTE f(x,y,...) WHERE x = QUERY key1.key2 AND y = QUERY key3 AND …
 Here are some examples:
 COMPUTE 2*x+3 WHERE x = QUERY person2.address.number // 27
