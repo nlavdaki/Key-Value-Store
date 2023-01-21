@@ -62,7 +62,9 @@ This part consists of two programs, a Key-Value client that will be accepting qu
 redirecting requests to the Key-Value servers, collecting the results and presenting them to the user
 and a KV Server that will be storing the actual data and will be handling the queries coming from the
 client. We describe each of these modules next.
-2-a ) KV Client (20%)
+
+2-a ) KV Client 
+
 The client should start with the following command:
 
 kvClient -s serverFile.txt -i dataToIndex.txt -k 2
